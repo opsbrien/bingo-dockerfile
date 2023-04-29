@@ -1,0 +1,25 @@
+FROM alpine:latest
+LABEL maintainer="ops_brien"
+
+# 传入环境等变量
+ARG APP_NAME
+
+# 将编译好的二进制文件和配置文件添加到 Docker 镜像中
+ADD ${APP_NAME} /app/
+ADD config-uat.yaml /app/config/
+
+# 设置工作目录
+WORKDIR /app
+
+# 创建基础目录
+RUN mkdir -p /app/logs
+RUN chmod -R 777 /app
+
+# 安装运行程序所需的依赖
+RUN apk --no-cache add ca-certificates
+
+# 设置容器的网络连接和监听端口
+EXPOSE 80 443 8080 8443
+
+# 执行启动命令
+CMD ["./${APP_NAME}", "-config", "/app/config.yaml", "-log", "/app/logs/${APP_NAME}.json"]
