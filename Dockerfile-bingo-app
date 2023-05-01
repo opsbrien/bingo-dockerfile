@@ -5,21 +5,23 @@ LABEL maintainer="ops_brien"
 ARG APP_NAME
 ENV APP_NAME=${APP_NAME}
 
-# 将编译好的二进制文件和配置文件添加到 Docker 镜像中
-ADD ${APP_NAME} /app/
+# 安装运行程序所需的依赖
+RUN apk --no-cache add curl ca-certificates
 
 # 设置工作目录
 WORKDIR /app
 
 # 创建基础目录
 RUN mkdir -p /app/logs
-RUN chmod -R 777 /app
+RUN chmod -R 777 /app/${APP_NAME}
 
-# 安装运行程序所需的依赖
-RUN apk --no-cache add ca-certificates curl
+# COPY 主程序
+COPY ${APP_NAME} /app/
+
+ curl -s https://raw.githubusercontent.com/opsbrien/bingo-dockerfile/master/Dockerfile-bingo-app > app-${APP_NAME}.yaml
 
 # 设置容器的网络连接和监听端口
-EXPOSE 80 443 8080 8443
+EXPOSE 16001
 
 # 执行启动命令
-CMD ["/bin/sh", "-c", "ls", "pwd"]
+CMD ["/bin/sh", "-c", "/app/${APP_NAME} -f=/app/app-${APP_NAME}.yaml"]
