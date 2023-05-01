@@ -6,17 +6,13 @@ ARG APP_NAME
 ENV APP_NAME=${APP_NAME}
 
 # 安装运行程序所需的依赖
-RUN apk --no-cache add curl ca-certificates
+RUN apk update && apk --no-cache add curl ca-certificates
 
 # 设置工作目录
 WORKDIR /app
 
 # COPY 主程序
-COPY ${APP_NAME} /app/
-
-# 创建基础目录
-RUN mkdir -p /app/logs
-RUN chmod -R 775 /app/${APP_NAME}
+COPY ${APP_NAME} .
 
 RUN curl -s https://raw.githubusercontent.com/opsbrien/bingo-dockerfile/master/app-settlement.yaml > ${APP_NAME}.yaml
 
@@ -24,6 +20,4 @@ RUN curl -s https://raw.githubusercontent.com/opsbrien/bingo-dockerfile/master/a
 EXPOSE 16001
 
 # 执行启动命令
-CMD ["/bin/sh", "-c", "/app/${APP_NAME}", "-f", "/app/app-${APP_NAME}.yaml"]
-
-
+ENTRYPOINT ["/bin/sh","-c","./${APP_NAME}","-f","./${APP_NAME}.yaml"]
