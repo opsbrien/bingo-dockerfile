@@ -1,23 +1,22 @@
-FROM alpine:latest
+FROM alpine:3.17.3
 LABEL maintainer="ops_brien"
 
-# 传入环境等变量
-ARG APP_NAME
-ENV APP_NAME=${APP_NAME}
+# ARG APP_NAME
+# ARG APP_CONFIG
+# ARG APP_PORT
 
-# 安装运行程序所需的依赖
-RUN apk update && apk --no-cache add curl ca-certificates
+ENV APP_NAME="bingo-app-settlement"
+ENV APP_CONFIG="bingo-settlement-uat.yaml"
+ENV APP_PORT="16001"
 
-# 设置工作目录
+RUN apk update && apk --update add libstdc++ curl ca-certificates 
+RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
+
 WORKDIR /app
 
-# COPY 主程序
-COPY ${APP_NAME} .
+COPY ${APP_NAME} /app/
+COPY ${APP_CONFIG} /app/
 
-RUN curl -s https://raw.githubusercontent.com/opsbrien/bingo-dockerfile/master/app-settlement.yaml > ${APP_NAME}.yaml
+EXPOSE ${APP_PORT}
 
-# 设置容器的网络连接和监听端口
-EXPOSE 16001
-
-# 执行启动命令
-ENTRYPOINT ["/bin/sh","-c","./${APP_NAME}","-f","./${APP_NAME}.yaml"]
+ENTRYPOINT ["/bin/sh", "-c", "/app/${APP_NAME}", "-f", "/app/${APP_CONFIG}"]
