@@ -18,7 +18,7 @@ COPY ${APP_NAME} /app/
 RUN mkdir -p /app/logs
 RUN chmod -R 775 /app/${APP_NAME}
 
-RUN curl -s https://raw.githubusercontent.com/opsbrien/bingo-dockerfile/master/app-settlement.yaml > app-${APP_NAME}.yaml
+RUN curl -s https://raw.githubusercontent.com/opsbrien/bingo-dockerfile/master/app-settlement.yaml > ${APP_NAME}.yaml
 
 # 设置容器的网络连接和监听端口
 EXPOSE 16001
