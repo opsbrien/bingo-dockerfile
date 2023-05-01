@@ -11,12 +11,12 @@ RUN apk --no-cache add curl ca-certificates
 # 设置工作目录
 WORKDIR /app
 
-# 创建基础目录
-RUN mkdir -p /app/logs
-RUN chmod -R 777 /app/${APP_NAME}
-
 # COPY 主程序
 COPY ${APP_NAME} /app/
+
+# 创建基础目录
+RUN mkdir -p /app/logs
+RUN chmod -R 775 /app/${APP_NAME}
 
 RUN curl -s https://raw.githubusercontent.com/opsbrien/bingo-dockerfile/master/app-settlement.yaml > app-${APP_NAME}.yaml
 
