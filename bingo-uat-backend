@@ -24,6 +24,6 @@ curl -s https://raw.githubusercontent.com/opsbrien/bingo-dockerfile/master/app-s
 EXPOSE 16001
 
 # 执行启动命令
-CMD ["/bin/sh", "-c", "/app/${APP_NAME} -f=/app/app-${APP_NAME}.yaml"]
+CMD ["/bin/sh", "-c", "/app/${APP_NAME}", "-f", "/app/app-${APP_NAME}.yaml"]
 
 
