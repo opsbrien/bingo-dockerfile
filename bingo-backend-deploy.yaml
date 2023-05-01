@@ -1,1 +1,68 @@
-
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: $APP_NAME
+  namespace: $NAMESPACE
+  labels:
+    app: $APP_NAME
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: $APP_NAME
+  template:
+    metadata:
+      labels:
+        app: $APP_NAME
+    spec:
+      volumes:
+        - name: host-time
+          hostPath:
+            path: /etc/localtime
+            type: ''
+      imagePullSecrets:
+        - name: ph-harbor-admin
+      containers:
+        - name: $APP_NAME
+          image: ${HARBOR_URL}/${NAMESPACE}/${APP_NAME}:${DOCKER_IMAGE_TAG}
+          ports:
+            - name: port-$SVR_PROT
+              containerPort: $SVR_PROT
+              protocol: TCP
+          env:
+            - name: APP_NAME
+              value: $APP_NAME
+          resources: {}
+          volumeMounts:
+            - name: host-time
+              readOnly: true
+              mountPath: /etc/localtime
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      dnsPolicy: ClusterFirst
+  serviceName: $APP_NAME
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  revisionHistoryLimit: 10
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: $APP_NAME
+  namespace: $NAMESPACE
+  labels:
+    app: $APP_NAME
+spec:
+  ports:
+    - name: port-$SVR_PROT
+      protocol: TCP
+      port: $SVR_PROT
+      targetPort: $SVR_PROT
+  selector:
+    app: $APP_NAME
+  type: ClusterIP
